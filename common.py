@@ -29,6 +29,9 @@ INF_GAZE_CSV = "../main20170707/inf_gaze_from_3ch_flow.csv"
 
 RESULT_DIR = "../main20170707/result/"
 
+AREA_CSV = "../cutting_area_data/opened_area.csv"
+PROCESS_CSV = "../cutting_area_data/surgical_process.csv"
+
 def setup_device(model):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if torch.cuda.device_count() > 0:

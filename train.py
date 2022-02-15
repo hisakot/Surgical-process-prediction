@@ -84,24 +84,7 @@ if __name__ == '__main__':
     if args.network == "ResNet50":
         train, test = torch.utils.data.random_split(datas, [train_size, test_size])
         model = model.ResNet50(pretrained=True, num_input_channel=args.input_ch,
-                               num_output=2) # output=(x, y)
-    elif args.network == "ResNet50LSTM":
-        datas = dataset_lstm.setup_data()
-        train = torch.utils.data.Subset(datas, list(range(0, 80000)))
-        test = torch.utils.data.Subset(datas, list(range(80000, 100000)))
-        model = model.ResNet50LSTM(pretrained=True, num_input_channel=args.input_ch,
-                                   num_output=2) # output=(x, y)
-    elif args.network == "ResNet18LSTM":
-        datas = dataset_lstm.setup_data()
-        train = torch.utils.data.Subset(datas, list(range(0, 80000)))
-        test = torch.utils.data.Subset(datas, list(range(80000, 100000)))
-        model = model.ResNet18LSTM(pretrained=True, num_input_channel=args.input_ch,
-                                   num_output=2) # output=(x, y)
-    elif args.network == "LSTM":
-        train = torch.utils.data.Subset(datas, list(range(0, train_size)))
-        test = torch.utils.data.Subset(datas, list(range(train_size, datas.length)))
-        model = model.LSTM(pretrained=True, num_input_channel=args.input_ch,
-                           num_output=2, batch_size=args.batch_size) # output=(x, y)
+                               num_output=3)
 
     trainloader = torch.utils.data.DataLoader(
             train, batch_size=args.batch_size, shuffle=False, num_workers=4)

@@ -18,47 +18,24 @@ class Datas():
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        # load hand image
-        hand_path = self.dataset[idx]["hand_path"]
-        hand_img = cv2.imread(hand_path) # (h, w, c)
-        hand_img = cv2.resize(hand_img, (common.IMG_W, common.IMG_H))
-#         hand_img = hand_img[:, :, 0] # (h, w)
-#         hand_img = hand_img[:, :, np.newaxis] # (h, w, 1ch)
-
-        # load tool image
-        tool_path = self.dataset[idx]["tool_path"]
-        tool_img = cv2.imread(tool_path) # (h, w, c)
-        tool_img = cv2.resize(tool_img, (common.IMG_W, common.IMG_H))
-#         tool_img = tool_img[:, :, 1] # (h, w)
-#         tool_img = tool_img[:, :, np.newaxis] # (h, w, 1ch)
-
-        # load cutting_area imag
-        cutting_path = self.dataset[idx]["cutting_path"]
-        cutting_img = cv2.imread(cutting_path) # (h, w, c)
-        cutting_img = cv2.resize(cutting_img, (common.IMG_W, common.IMG_H))
-#         cutting_img = cutting_img[:, :, 0] # (h, w)
-#         cutting_img = cutting_img[:, :, np.newaxis] # (h, w, 1ch)
-
-        # concatenate images
-        image = np.concatenate([hand_img, tool_img], axis=2)
-        image = np.concatenate([image, cutting_img], axis=2)
-        image = image.astype(np.float32) / 255.0
-        image = np.transpose(image, (2, 0, 1)) # (c, h, w)
-        image = torch.tensor(image, dtype=torch.int64) # tensor
+        # load area csv
+        area = self.dataset[idx]["area"]
+        area = torch.tensor(area, dtype=torch.float32)
 
         # load label
-        gaze_point = self.dataset[idx]["gaze_point"] # (x, y)
-        label = torch.tensor(gaze_point, dtype=torch.float32)
+        process = self.dataset[idx]["process"] # (x, y)
+        process = torch.tensor(process, dtype=torch.float32)
 
-        return image, label
+        return area, label
 
 def make_dataset():
     dataset_dicts = list()
-    org_paths = glob.glob(common.ORG_IMG)
-    org_paths.sort()
+    area = np.loadtxt(common.AREA_CSV, delimiter=",", skiprows=1, usecols=(1, 2, 3))
 
-    gaze_points = np.loadtxt(common.GAZE_CSV, delimiter=",", skiprows=1, usecols=(1, 2))
-    gaze_points *= np.array([common.IMG_W, common.IMG_H]) # pix
+    process = np.loadtxt(common.PROCESS_CSV, delimiter=",")
+
+    print(area.shape, process.shape)
+    exit()
 
     for i, org_path in enumerate(org_paths):
         if gaze_points[i][0] == 0 and gaze_points[i][1] == 0:
@@ -77,15 +54,6 @@ def make_dataset():
                               "gaze_point" : gaze_points[i],})
 
     return dataset_dicts
-
-def make_temporal_data(data, frame_num):
-    image = list()
-    target = list()
-    for idx in range(frame_num):
-        image.append(data[idx][0])
-        target.append(data[idx][1])
-    image = torch.stack(image, dim=0)
-    return image, target
 
 def setup_data():
     datas = Datas()
