@@ -24,34 +24,20 @@ class Datas():
 
         # load label
         process = self.dataset[idx]["process"] # (x, y)
-        process = torch.tensor(process, dtype=torch.float32)
+        process = torch.tensor(process, dtype=torch.long)
 
         return area, label
 
 def make_dataset():
     dataset_dicts = list()
-    area = np.loadtxt(common.AREA_CSV, delimiter=",", skiprows=1, usecols=(1, 2, 3))
+    area = np.loadtxt(common.AREA_CSV, delimiter=",", usecols=(1, 2, 3))
 
-    process = np.loadtxt(common.PROCESS_CSV, delimiter=",")
+    with open(common.PROCESS_CSV, "r") as f:
+        reader = csv.reader(f, delimiter=",")
+        processes = [row for row in reader]
 
-    print(area.shape, process.shape)
-    exit()
-
-    for i, org_path in enumerate(org_paths):
-        if gaze_points[i][0] == 0 and gaze_points[i][1] == 0:
-            continue
-#         hand_path = org_path.replace("org_imgs", "contour")
-#         tool_path = org_path.replace("org_imgs", "tool_masks")
-#         cutting_path = org_path.replace("org_imgs", "cutting_area")
-        hand_path = org_path.replace("org_imgs", "flow_hand")
-        tool_path = org_path.replace("org_imgs", "flow_tool")
-        cutting_path = org_path.replace("org_imgs", "flow_cut")
-        dataset_dicts.append({"org_path" : org_path,
-                              "hand_path" : hand_path,
-                              "tool_path" : tool_path,
-                              "cutting_path" : cutting_path,
-                              "flow_path" : flow_path,
-                              "gaze_point" : gaze_points[i],})
+    for i, process in enumerate(processes):
+        dataset_dicts.append({"area" : area[i], "process" : process})
 
     return dataset_dicts
 
